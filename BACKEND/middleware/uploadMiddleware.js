@@ -4,8 +4,12 @@ const fs = require('fs');
 
 // Create uploads directory if it doesn't exist
 const uploadDir = 'uploads/';
+const productDir = 'uploads/products/';
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
+}
+if (!fs.existsSync(productDir)) {
+  fs.mkdirSync(productDir, { recursive: true });
 }
 
 // Storage configuration
