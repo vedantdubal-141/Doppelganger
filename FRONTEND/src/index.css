@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Orbitron:wght@400;500;700;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
-
 @import "tailwindcss";
+@import "./styles/animations.css";
 
 /* ── Tailwind v4 theme (replaces tailwind.config.js) ── */
 @theme {
@@ -43,7 +43,6 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
-
   background-image:
     radial-gradient(circle at 50% 50%, rgba(0, 240, 255, 0.03) 0%, transparent 50%),
     linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
@@ -113,4 +112,14 @@ body {
   color: var(--color-neon-pink);
   background-image: none;
   background-color: var(--color-background-secondary);
+}
+
+.shadow-neon-cyan {
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.8);
+}
+.shadow-neon-purple {
+  box-shadow: 0 0 10px rgba(123, 97, 255, 0.8);
+}
+.shadow-neon-pink {
+  box-shadow: 0 0 10px rgba(255, 46, 166, 0.8);
 }
