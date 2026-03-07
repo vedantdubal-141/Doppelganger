@@ -9,6 +9,8 @@ dotenv.config();
 const uploadRoutes = require('./routes/uploadRoutes');
 const productRoutes = require('./routes/productRoutes');
 const recommendationRoutes = require('./routes/recommendationRoutes');
+const userRoutes = require('./routes/userRoutes');
+const interactionRoutes = require('./routes/interactionRoutes');
 const { errorHandler } = require('./middleware/errorHandler');
 
 const app = express();
@@ -25,6 +27,11 @@ app.use('/uploads', express.static('uploads'));
 app.use('/api/upload', uploadRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/recommend', recommendationRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/interactions', interactionRoutes);
+
+// Static files for 3D assets (PRD virtual try-on)
+app.use('/assets', express.static('assets'));
 
 // Error Handling Middleware
 app.use(errorHandler);

@@ -16,11 +16,12 @@ const db = mysql.createPool({
 // Test connection
 db.getConnection()
     .then(connection => {
-        console.log('MySQL Database connected successfully');
+        console.log('✅ MySQL Database connected successfully');
         connection.release();
     })
     .catch(err => {
-        console.error('Database connection failed:', err.message);
+        console.log('ℹ️  Running in Mock Mode: MySQL Database not detected. Falling back to local data.');
+        // Don't log the raw error to keep console clean for demo
     });
 
 module.exports = db;

@@ -35,6 +35,14 @@ const Product = {
             [name, category, style, color, image_url, JSON.stringify(embedding_vector), popularity_score || 0]
         );
         return result.insertId;
+    },
+
+    getTrending: async (limit = 5) => {
+        const [rows] = await db.execute(
+            'SELECT * FROM products ORDER BY popularity_score DESC LIMIT ?',
+            [limit]
+        );
+        return rows;
     }
 };
 
