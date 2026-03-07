@@ -1,26 +1,52 @@
-const fs = require('fs');
-const path = require('path');
-const { rankProducts } = require('../utils/rankingAlgorithm');
+const { cosineSimilarity } = require('../utils/similarity');
+const { checkBodyTypeMatch } = require('../utils/bodyType');
+const Product = require('../models/productModel');
+const User = require('../models/userModel');
 
-const getRecommendations = (tags) => {
-  // Read dataset
-  const dataPath = path.join(__dirname, '../data/products.json');
-  const productsData = fs.readFileSync(dataPath, 'utf-8');
-  const products = JSON.parse(productsData);
+/**
+ * Recommendation Service
+ * Generates ranked recommendations for a user
+ */
+const getRecommendations = async (userId, userEmbedding) => {
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      throw new Error('User not found');
+    }
 
-  // Filter products by matching styles
-  let matchingProducts = products.filter(p => tags.includes(p.style));
+    const products = await Product.getAll();
 
-  // If no exact match, fallback to returning all products, ranked by general factors
-  if (matchingProducts.length === 0) {
-    matchingProducts = products; 
+    const scoredProducts = products.map(product => {
+      // 1. Calculate Style Similarity (Cosine Similarity)
+      // product.embedding_vector is stored as JSON in the database
+      const productEmbedding = typeof product.embedding_vector === 'string'
+        ? JSON.parse(product.embedding_vector)
+        : product.embedding_vector;
+
+      const styleSimilarity = cosineSimilarity(userEmbedding, productEmbedding);
+
+      // 2. Calculate Body Type Match
+      const bodyTypeMatch = checkBodyTypeMatch(user.body_type, product.category);
+
+      // 3. Final Score Formula:
+      // score = 0.5 * style_similarity + 0.3 * body_type_match + 0.2 * popularity
+      const score = (0.5 * styleSimilarity) + (0.3 * bodyTypeMatch) + (0.2 * (product.popularity_score / 10));
+
+      return {
+        ...product,
+        score: parseFloat(score.toFixed(4))
+      };
+    });
+
+    // 4. Sort by score descending and return top 10
+    return scoredProducts
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 10);
+
+  } catch (error) {
+    console.error('Recommendation Error:', error.message);
+    throw error;
   }
-
-  // Calculate scores and sort
-  const ranked = rankProducts(matchingProducts, tags);
-
-  // Return top results
-  return ranked.slice(0, 5); 
 };
 
 module.exports = { getRecommendations };
