@@ -1,48 +1,116 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Orbitron:wght@400;500;700;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-@layer base {
-  body {
-    @apply bg-background-primary text-chrome-100 font-inter antialiased overflow-x-hidden;
-    /* subtle background pattern to fit futurism */
-    background-image: 
-      radial-gradient(circle at 50% 50%, rgba(0, 240, 255, 0.03) 0%, transparent 50%),
-      linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
-    background-size: 100% 100%, 40px 40px, 40px 40px;
-  }
+/* ── Tailwind v4 theme (replaces tailwind.config.js) ── */
+@theme {
+  /* Background colors */
+  --color-background-primary: #0B0B0F;
+  --color-background-secondary: #121218;
+
+  /* Chrome / Metallic neutrals */
+  --color-chrome-50: #FFFFFF;
+  --color-chrome-100: #EDEDED;
+  --color-chrome-200: #E8E8E8;
+  --color-chrome-300: #C7C7C7;
+  --color-chrome-400: #C0C0C0;
+  --color-chrome-500: #9E9E9E;
+  --color-chrome-600: #8C8C8C;
+  --color-chrome-700: #7A7A7A;
+
+  /* Neon accents */
+  --color-neon-cyan: #00F0FF;
+  --color-neon-purple: #7B61FF;
+  --color-neon-pink: #FF2EA6;
+  --color-neon-blue: #2D8CFF;
+
+  /* Font families */
+  --font-orbitron: 'Orbitron', sans-serif;
+  --font-space: 'Space Grotesk', sans-serif;
+  --font-inter: 'Inter', sans-serif;
+
+  /* Box shadows */
+  --shadow-neon-cyan: 0 0 10px rgba(0, 240, 255, 0.8);
+  --shadow-neon-purple: 0 0 10px rgba(123, 97, 255, 0.8);
+  --shadow-neon-pink: 0 0 10px rgba(255, 46, 166, 0.8);
 }
 
-@layer components {
-  /* Utility classes directly referenced from the Spec */
-  .glass-panel {
-    @apply bg-[rgba(255,255,255,0.05)] backdrop-blur-md border border-[rgba(255,255,255,0.1)] rounded-xl;
-  }
-  
-  .glass-card-hover {
-    @apply transition-all duration-300 hover:scale-[1.02] hover:border-neon-cyan hover:shadow-neon-cyan;
-  }
+/* ── Base body styles ── */
+body {
+  background-color: var(--color-background-primary);
+  color: var(--color-chrome-100);
+  font-family: var(--font-inter);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
 
-  .text-gradient {
-    @apply bg-clip-text text-transparent;
-  }
-  
-  .chrome-text {
-    @apply text-gradient bg-chrome-gradient;
-  }
-  
-  .neon-text-primary {
-    @apply text-gradient bg-neon-gradient;
-  }
+  background-image:
+    radial-gradient(circle at 50% 50%, rgba(0, 240, 255, 0.03) 0%, transparent 50%),
+    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 100% 100%, 40px 40px, 40px 40px;
+}
 
-  .chrome-button {
-    @apply bg-chrome-gradient border border-chrome-500 rounded-lg px-5 py-3 text-background-primary font-space font-bold uppercase tracking-wider transition-all duration-300;
-  }
+/* ── Reusable component classes ── */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+}
 
-  .chrome-button:hover {
-    @apply shadow-neon-pink scale-105 border-neon-pink text-neon-pink bg-none bg-background-secondary;
-  }
+.glass-card-hover {
+  transition: all 0.3s ease;
+}
+.glass-card-hover:hover {
+  transform: scale(1.02);
+  border-color: var(--color-neon-cyan);
+  box-shadow: var(--shadow-neon-cyan);
+}
+
+.text-gradient {
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+.chrome-text {
+  background-image: linear-gradient(180deg, #FFFFFF, #C7C7C7, #8C8C8C, #E8E8E8);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+.neon-text-primary {
+  background-image: linear-gradient(90deg, #00F0FF, #7B61FF, #FF2EA6);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+.chrome-button {
+  background-image: linear-gradient(180deg, #FFFFFF, #C7C7C7, #8C8C8C, #E8E8E8);
+  border: 1px solid var(--color-chrome-500);
+  border-radius: 8px;
+  padding: 12px 20px;
+  color: var(--color-background-primary);
+  font-family: var(--font-space);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.chrome-button:hover {
+  box-shadow: var(--shadow-neon-pink);
+  transform: scale(1.05);
+  border-color: var(--color-neon-pink);
+  color: var(--color-neon-pink);
+  background-image: none;
+  background-color: var(--color-background-secondary);
 }
