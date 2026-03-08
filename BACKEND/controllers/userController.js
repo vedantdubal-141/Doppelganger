@@ -3,25 +3,28 @@ const { calculateBodyType } = require('../utils/bodyType');
 
 const createUser = async (req, res, next) => {
     try {
-        const { name, height, weight, shoulder_width, waist } = req.body;
+        const { username, email, password_hash, height, weight, shoulder, waist } = req.body;
 
-        if (!name || !height || !weight || !shoulder_width || !waist) {
+        if (!username || !email || !password_hash || !height || !weight || !shoulder || !waist) {
             res.status(400);
-            throw new Error('Please provide all user measurements (name, height, weight, shoulder_width, waist)');
+            throw new Error('Please provide all user details (username, email, password_hash, height, weight, shoulder, waist)');
         }
 
         // Automated body type calculation from PRD Section 10
-        const body_type = calculateBodyType(shoulder_width, waist);
+        const body_type = calculateBodyType(shoulder, waist);
 
         let userId;
         try {
             userId = await User.create({
-                name,
+                username,
+                email,
+                password_hash,
                 height,
                 weight,
-                shoulder_width,
+                shoulder,
                 waist,
-                body_type
+                body_type,
+                level: 1
             });
         } catch (dbError) {
             console.warn('Database user creation failed, returning mock success:', dbError.message);

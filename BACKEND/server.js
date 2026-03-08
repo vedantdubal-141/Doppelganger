@@ -1,6 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const connectDB = require('./config/mongo');
+const initMySQL = require('./scripts/init_mysql');
 
 // Load env variables
 dotenv.config();
@@ -12,6 +14,10 @@ const recommendationRoutes = require('./routes/recommendationRoutes');
 const userRoutes = require('./routes/userRoutes');
 const interactionRoutes = require('./routes/interactionRoutes');
 const { errorHandler } = require('./middleware/errorHandler');
+
+// Initialize Databases
+connectDB();
+initMySQL();
 
 const app = express();
 
