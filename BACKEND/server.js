@@ -9,8 +9,12 @@ dotenv.config();
 const uploadRoutes = require('./routes/uploadRoutes');
 const productRoutes = require('./routes/productRoutes');
 const recommendationRoutes = require('./routes/recommendationRoutes');
-const userRoutes = require('./routes/userRoutes');
 const interactionRoutes = require('./routes/interactionRoutes');
+const authRoutes = require('./routes/authRoutes');
+const userRoutes = require('./routes/userRoutes');
+const designRoutes = require('./routes/designRoutes');
+const communityRoutes = require('./routes/communityRoutes');
+const tryonRoutes = require('./routes/tryonRoutes');
 const { errorHandler } = require('./middleware/errorHandler');
 
 const app = express();
@@ -24,11 +28,15 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static('uploads'));
 
 // Routes
-app.use('/api/upload', uploadRoutes);
+app.use('/api/analyze', uploadRoutes); // Updated per requirements
 app.use('/api/products', productRoutes);
 app.use('/api/recommend', recommendationRoutes);
-app.use('/api/users', userRoutes);
 app.use('/api/interactions', interactionRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/designs', designRoutes);
+app.use('/api/community', communityRoutes);
+app.use('/api/try-on', tryonRoutes);
 
 // Static files for 3D assets (PRD virtual try-on)
 app.use('/assets', express.static('assets'));
