@@ -1,15 +1,10 @@
 import React, { useEffect, useState } from 'react';
-<<<<<<< HEAD
 import { useSearchParams, useLocation } from 'react-router-dom';
-=======
-import { useSearchParams } from 'react-router-dom';
->>>>>>> pr-12
 import { getRecommendations } from '../services/recommendApi';
 import ProductCard from '../components/shared/ProductCard';
 import Loader from '../components/ui/Loader';
 import { ChromeButton } from '../components/ui/ChromeButton';
 import { GlassCard } from '../components/ui/GlassCard';
-<<<<<<< HEAD
 import { Sparkles, Palette, Layers, Tag } from 'lucide-react';
 
 const Recommendations = () => {
@@ -26,28 +21,12 @@ const Recommendations = () => {
 
   const fetchRecommendations = async () => {
     setIsLoading(true);
-=======
-import { useLocation } from 'react-router-dom';
-
-const Recommendations = () => {
-  const [searchParams] = useSearchParams();
-  const [recommendations, setRecommendations] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const fetchRecommendations = async () => {
-    setIsLoading(true);
-    // Parse tags from URL (e.g. ?tags=casual,streetwear)
->>>>>>> pr-12
     const tagsParam = searchParams.get('tags');
     const tags = tagsParam ? tagsParam.split(',') : [];
 
     if (!tags.length) {
       setIsLoading(false);
-<<<<<<< HEAD
       return;
-=======
-      return; 
->>>>>>> pr-12
     }
 
     try {
@@ -61,17 +40,12 @@ const Recommendations = () => {
   };
 
   useEffect(() => {
-<<<<<<< HEAD
     // Use recommendations passed from StyleAnalyzer if available
     if (passedRecommendations && passedRecommendations.length > 0) {
       setRecommendations(passedRecommendations);
     } else {
       fetchRecommendations();
     }
-=======
-    // Automatically fetch on mount since data is already gathered
-    fetchRecommendations();
->>>>>>> pr-12
   }, [searchParams]);
 
   if (isLoading) {
@@ -92,16 +66,11 @@ const Recommendations = () => {
   }
 
   return (
-<<<<<<< HEAD
     <div className="pt-24 px-4 md:px-8 pb-24 min-h-screen">
-=======
-    <div className="pt-24 px-8 pb-24 min-h-screen">
->>>>>>> pr-12
       <h1 className="font-orbitron text-3xl md:text-5xl mb-4 chrome-text text-center uppercase">
         RECOMMENDED FOR YOU
       </h1>
       <p className="text-center font-space text-chrome-400 mb-12 max-w-2xl mx-auto flex items-center justify-center gap-2 flex-wrap">
-<<<<<<< HEAD
         Based on detected styles vector:
         {searchParams.get('tags')?.split(',').map(tag => (
           <span key={tag} className="text-neon-cyan border border-neon-cyan/50 px-2 py-1 rounded text-xs uppercase bg-neon-cyan/10">
@@ -218,19 +187,6 @@ const Recommendations = () => {
       {recommendations.length === 0 && !generatedDesign ? (
         <div className="text-center font-space text-chrome-500">
           No matching styles found in the database.
-=======
-        Based on detected styles vector: 
-        {searchParams.get('tags')?.split(',').map(tag => (
-           <span key={tag} className="text-neon-cyan border border-neon-cyan/50 px-2 py-1 rounded text-xs uppercase bg-neon-cyan/10">
-             {tag.trim()}
-           </span>
-        ))}
-      </p>
-
-      {recommendations.length === 0 ? (
-        <div className="text-center font-space text-chrome-500">
-           No matching styles found in the database.
->>>>>>> pr-12
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 max-w-7xl mx-auto">
