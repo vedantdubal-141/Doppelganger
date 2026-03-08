@@ -7,7 +7,7 @@ const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
 
-const HF_API_URL = 'https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell';
+const HF_API_URL = 'https://router.huggingface.co/hf-inference/models/black-forest-labs/FLUX.1-schnell';
 
 /**
  * Generates a fashion image from a text prompt using Hugging Face's FLUX model.
@@ -33,7 +33,8 @@ const generateImage = async (prompt, options = {}) => {
       {
         headers: {
           'Authorization': `Bearer ${apiKey}`,
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Accept': 'image/png'
         },
         responseType: 'arraybuffer',
         timeout: 90000
