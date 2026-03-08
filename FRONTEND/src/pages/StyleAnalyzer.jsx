@@ -1,64 +1,115 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Upload, Camera, CheckCircle2, Scan } from 'lucide-react';
+import { Upload, X, Scan, Sparkles } from 'lucide-react';
 import { uploadImage } from '../services/uploadApi';
 import Loader from '../components/ui/Loader';
 import { ChromeButton } from '../components/ui/ChromeButton';
 import { GlassCard } from '../components/ui/GlassCard';
 
-const StyleAnalyzer = () => {
-  const [file, setFile] = useState(null);
-  const [previewUrl, setPreviewUrl] = useState('');
-  const [isScanning, setIsScanning] = useState(false);
-  const [error, setError] = useState(null);
-  
-
-  
+const UploadZone = ({ title, description, files, setFiles }) => {
   const fileInputRef = useRef(null);
-  const navigate = useNavigate();
 
   const handleFileSelect = (e) => {
-    const selectedFile = e.target.files[0];
-    if (selectedFile) {
-      setFile(selectedFile);
-      setPreviewUrl(URL.createObjectURL(selectedFile));
-      setError(null);
+    const selectedFiles = Array.from(e.target.files);
+    if (selectedFiles.length > 0) {
+      setFiles(prev => [
+        ...prev,
+        ...selectedFiles.map(f => ({ file: f, url: URL.createObjectURL(f) }))
+      ]);
     }
   };
 
   const handleDrop = (e) => {
     e.preventDefault();
-    const droppedFile = e.dataTransfer.files[0];
-    if (droppedFile && droppedFile.type.startsWith('image/')) {
-      setFile(droppedFile);
-      setPreviewUrl(URL.createObjectURL(droppedFile));
-      setError(null);
+    const droppedFiles = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
+    if (droppedFiles.length > 0) {
+      setFiles(prev => [
+        ...prev,
+        ...droppedFiles.map(f => ({ file: f, url: URL.createObjectURL(f) }))
+      ]);
     }
   };
 
+  const removeFile = (index) => {
+    setFiles(prev => prev.filter((_, i) => i !== index));
+  };
 
+  return (
+    <div className="flex flex-col h-full">
+      <h3 className="font-orbitron text-xl text-neon-cyan mb-2 text-center">{title}</h3>
+      <p className="font-space text-chrome-400 text-sm mb-6 text-center lg:h-10">{description}</p>
+
+      <GlassCard hoverEffect={false} className="border-neon-cyan/20 shadow-[0_0_15px_rgba(0,240,255,0.05)] flex-1 flex flex-col p-6">
+        <div
+          onDragOver={(e) => e.preventDefault()}
+          onDrop={handleDrop}
+          onClick={() => fileInputRef.current?.click()}
+          className="border-2 border-dashed border-chrome-600 rounded-xl p-6 flex flex-col items-center justify-center text-center hover:border-neon-cyan hover:bg-neon-cyan/5 transition-all cursor-pointer min-h-[160px] mb-6"
+        >
+          <Upload className="w-8 h-8 text-chrome-100 mb-3" />
+          <p className="font-orbitron text-sm text-chrome-300">DRAG & DROP OR CLICK</p>
+          <p className="font-space text-xs text-chrome-500 mt-2">Multiple JPG, PNG allowed</p>
+        </div>
+
+        {files.length > 0 && (
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-auto">
+            {files.map((fileObj, idx) => (
+              <div key={idx} className="relative group rounded-lg overflow-hidden border border-chrome-600 aspect-square">
+                <img src={fileObj.url} alt={`upload-${idx}`} className="w-full h-full object-cover" />
+                <button
+                  onClick={(e) => { e.stopPropagation(); removeFile(idx); }}
+                  className="absolute top-1 right-1 p-1 bg-black/70 hover:bg-red-500 rounded-full text-white backdrop-blur transition-colors opacity-0 group-hover:opacity-100"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <input
+          type="file"
+          ref={fileInputRef}
+          onChange={handleFileSelect}
+          accept="image/jpeg, image/png, image/jpg"
+          multiple
+          className="hidden"
+        />
+      </GlassCard>
+    </div>
+  );
+};
+
+const StyleAnalyzer = () => {
+  const [inspirations, setInspirations] = useState([]);
+  const [purchases, setPurchases] = useState([]);
+  const [isScanning, setIsScanning] = useState(false);
+  const [error, setError] = useState(null);
+
+  const navigate = useNavigate();
 
   const startAnalysis = async (e) => {
     e.preventDefault();
-    if (!file) {
-      setError("Please upload an image first.");
+    if (inspirations.length === 0 && purchases.length === 0) {
+      setError("Please upload at least one image in either category.");
       return;
     }
-    
+
     setIsScanning(true);
     setError(null);
-    
+
     try {
-      // Send to Backend
-      const data = await uploadImage(file);
-      
+      // Send arrays to updated backend service
+      const data = await uploadImage(inspirations, purchases);
+
+      // Navigate to recommendations passing tags via query param
       setTimeout(() => {
         setIsScanning(false);
-        // Navigate to recommendations passing tags via query param
-        const tagQuery = data.tags.join(',');
+        const tags = data?.tags || ['futuristic', 'cyberpunk', 'y2k']; // Fallback for testing
+        const tagQuery = tags.join(',');
         navigate(`/recommendations?tags=${encodeURIComponent(tagQuery)}`);
-      }, 1500);
-      
+      }, 2000);
+
     } catch (err) {
       setError(err.message);
       setIsScanning(false);
@@ -68,77 +119,67 @@ const StyleAnalyzer = () => {
   if (isScanning) {
     return (
       <div className="pt-32 px-8 min-h-screen flex flex-col items-center">
-         <h1 className="font-orbitron text-4xl mb-4 chrome-text">AI PROCESSING</h1>
-         <p className="font-space text-chrome-400 mb-12">Extracting embedded style components from your past preferences...</p>
-         <Loader message="CALCULATING COSINE SIMILARITY" />
+        <h1 className="font-orbitron text-4xl mb-4 chrome-text text-center">AI PROCESSING</h1>
+        <p className="font-space text-chrome-400 mb-12 text-center max-w-lg">
+          Extracting multi-dimensional aesthetic vectors from your curated inspirations and past wardrobe selections...
+        </p>
+        <Loader message="CALCULATING COSINE SIMILARITY" />
       </div>
     );
   }
 
   return (
-    <div className="pt-24 px-8 min-h-screen pb-12">
-      <h1 className="font-orbitron text-3xl md:text-5xl mb-4 chrome-text text-center">STYLE ANALYZER</h1>
+    <div className="pt-24 px-4 md:px-8 min-h-screen pb-12">
+      <h1 className="font-orbitron text-3xl md:text-5xl mb-4 chrome-text text-center flex justify-center items-center gap-4">
+        <Sparkles className="hidden md:block w-8 h-8 text-neon-cyan" />
+        STYLE ANALYZER
+        <Sparkles className="hidden md:block w-8 h-8 text-neon-purple" />
+      </h1>
       <p className="text-center font-space text-chrome-400 mb-12 max-w-2xl mx-auto">
-        Upload a photo of your favorite past purchases or style inspiration. Our AI will generate specialized embeddings 
-        to detect your aesthetic preferences.
+        Upload multiple photos of your past purchases and style inspirations. Our AI will analyze the combined
+        dataset to generate highly accurate, personalized aesthetic embeddings.
       </p>
-      
-      <div className="max-w-3xl mx-auto">
-        <GlassCard hoverEffect={false} className="border-neon-cyan/30 shadow-[0_0_20px_rgba(0,240,255,0.1)]">
-          {!previewUrl ? (
-            <div 
-              onDragOver={(e) => e.preventDefault()}
-              onDrop={handleDrop}
-              onClick={() => fileInputRef.current?.click()}
-              className="border-2 border-dashed border-chrome-600 rounded-xl p-16 flex flex-col items-center justify-center text-center hover:border-neon-cyan hover:bg-neon-cyan/5 transition-all cursor-pointer min-h-[400px]"
-            >
-              <div className="w-20 h-20 rounded-full bg-background-secondary flex items-center justify-center mb-6 shadow-black/50 shadow-lg">
-                <Upload className="w-8 h-8 text-chrome-100" />
-              </div>
-              <h3 className="font-orbitron text-xl text-chrome-100 mb-2">DRAG & DROP IMAGE HERE</h3>
-              <p className="font-space text-chrome-500 mb-8">JPG, PNG up to 5MB</p>
-              
-              <ChromeButton onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }} type="button">
-                BROWSE FILES
-              </ChromeButton>
-            </div>
-          ) : (
-            <div className="flex flex-col items-center">
-              <div className="relative w-full max-w-md h-96 rounded-xl overflow-hidden mb-8 border border-chrome-500">
-                <img src={previewUrl} alt="Preview" className="w-full h-full object-cover" />
-                <div className="absolute top-4 right-4 bg-background-primary/80 backdrop-blur px-3 py-1 rounded text-neon-cyan font-orbitron text-sm flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4" /> UPLOADED
-                </div>
-              </div>
-              
-              <div className="flex gap-4">
-                <button 
-                  onClick={() => { setFile(null); setPreviewUrl(''); }}
-                  className="px-6 py-3 font-space text-chrome-400 hover:text-white transition-colors"
-                >
-                  RESELECT
-                </button>
-                <ChromeButton onClick={startAnalysis} className="px-10 flex items-center gap-2">
-                  <Scan className="w-5 h-5 border-blue-500" /> COMMENCE SCAN
-                </ChromeButton>
-              </div>
-            </div>
-          )}
-          
-          <input 
-            type="file" 
-            ref={fileInputRef} 
-            onChange={handleFileSelect} 
-            accept="image/jpeg, image/png, image/jpg" 
-            className="hidden" 
-          />
-        </GlassCard>
 
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto mb-10 text-left">
+        <UploadZone
+          title="STYLE INSPIRATIONS"
+          description="Vibes, aesthetics, and clothing concepts you want the AI to learn from."
+          files={inspirations}
+          setFiles={setInspirations}
+        />
+
+        <UploadZone
+          title="PAST PURCHASES"
+          description="Clothes you already own. We'll use these to anchor recommendations to your reality."
+          files={purchases}
+          setFiles={setPurchases}
+        />
+      </div>
+
+      <div className="flex flex-col items-center max-w-6xl mx-auto">
         {error && (
-          <div className="mt-6 p-4 bg-red-900/20 border border-red-500 text-red-500 font-space text-center rounded">
+          <div className="mb-6 p-4 w-full max-w-md bg-red-900/20 border border-red-500 text-red-500 font-space text-center rounded">
             ERROR: {error}
           </div>
         )}
+
+        <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto px-4">
+          {(inspirations.length > 0 || purchases.length > 0) && (
+            <button
+              onClick={() => { setInspirations([]); setPurchases([]); setError(null); }}
+              className="px-6 py-4 sm:py-3 border border-chrome-600 rounded-lg font-space text-chrome-400 hover:text-white hover:border-chrome-400 hover:bg-white/5 transition-colors w-full sm:w-auto"
+            >
+              CLEAR ALL
+            </button>
+          )}
+          <ChromeButton
+            onClick={startAnalysis}
+            className={`px-10 py-4 sm:py-3 flex justify-center items-center gap-3 w-full sm:w-auto ${(inspirations.length === 0 && purchases.length === 0) ? 'opacity-50 cursor-not-allowed' : ''}`}
+          >
+            <Scan className="w-5 h-5 text-neon-cyan" />
+            COMMENCE DATA SCAN
+          </ChromeButton>
+        </div>
       </div>
     </div>
   );

@@ -39,20 +39,20 @@ export const AuthProvider = ({ children }) => {
       };
     });
   };
-  
+
   const removeOutfit = (productId) => {
-     setUser(prev => ({
-        ...prev,
-        savedOutfits: prev.savedOutfits.filter(item => item.id !== productId)
-     }));
+    setUser(prev => ({
+      ...prev,
+      savedOutfits: prev.savedOutfits.filter(item => item.id !== productId)
+    }));
   };
 
   const hasCompleteProfile = () => {
-    return user.biometrics && 
-           user.biometrics.height && 
-           user.biometrics.weight && 
-           user.biometrics.shoulderWidth && 
-           user.biometrics.waist;
+    return user.biometrics &&
+      user.biometrics.height &&
+      user.biometrics.weight &&
+      user.biometrics.shoulderWidth &&
+      user.biometrics.waist;
   };
 
   return (

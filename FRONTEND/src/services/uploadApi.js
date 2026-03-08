@@ -2,9 +2,16 @@ import axios from 'axios';
 
 const API_URL = 'http://localhost:5000/api';
 
-export const uploadImage = async (file) => {
+export const uploadImage = async (inspirations, purchases) => {
   const formData = new FormData();
-  formData.append('image', file);
+  
+  if (inspirations && inspirations.length > 0) {
+    inspirations.forEach(item => formData.append('inspirations', item.file));
+  }
+  
+  if (purchases && purchases.length > 0) {
+    purchases.forEach(item => formData.append('purchases', item.file));
+  }
 
   try {
     const response = await axios.post(`${API_URL}/upload`, formData, {
@@ -14,6 +21,6 @@ export const uploadImage = async (file) => {
     });
     return response.data;
   } catch (error) {
-    throw new Error(error.response?.data?.error || 'Failed to upload image');
+    throw new Error(error.response?.data?.error || 'Failed to upload images');
   }
 };
