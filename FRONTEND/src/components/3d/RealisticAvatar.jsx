@@ -8,7 +8,7 @@ import * as THREE from 'three';
  * Loads a realistic rigged humanoid (Xbot), scales its bones dynamically based on biometrics,
  * and attaches physical 3D geometric parts (cyber armor, visors, etc) based on the full outfit.
  */
-export default function RealisticAvatar({ measurements = {}, outfitColors = {} }) {
+export default function RealisticAvatar({ measurements = {}, outfitColors = {}, clothingColor = '#00F0FF' }) {
     // Load the GLTF. The path must be relative to the public folder.
     const { scene, animations, nodes, materials } = useGLTF('/models/avatar.glb');
     const shirtModel = useGLTF('/models/shirt_baked.glb');
@@ -92,15 +92,18 @@ export default function RealisticAvatar({ measurements = {}, outfitColors = {} }
         ['outerwear', 'pants', 'accessory', 'shirt', 'footwear'].forEach(cat => {
             if (outfitColors[cat]) {
                 targetColors.current[cat].set(outfitColors[cat]);
+            } else if (cat === 'shirt' && clothingColor) {
+                // Fallback to legacy clothingColor if specific shirt color missing
+                targetColors.current[cat].set(clothingColor);
             }
         });
         // If shirt exists, base outer shell reflects shirt color. Otherwise dark cyber skin.
-        if (outfitColors['shirt']) {
-            targetColors.current.baseSkin.set(outfitColors['shirt']);
+        if (outfitColors['shirt'] || clothingColor) {
+            targetColors.current.baseSkin.set(outfitColors['shirt'] || clothingColor);
         } else {
             targetColors.current.baseSkin.set('#1a1a1a');
         }
-    }, [outfitColors]);
+    }, [outfitColors, clothingColor]);
 
     useFrame(() => {
         // Smooth lerp colors
@@ -179,7 +182,7 @@ export default function RealisticAvatar({ measurements = {}, outfitColors = {} }
         )
     ) : null;
 
-    const shirtParts = nodes?.mixamorigSpine2 && outfitColors['shirt'] ? (
+    const shirtParts = nodes?.mixamorigSpine2 && (outfitColors['shirt'] || clothingColor) ? (
         createPortal(
             <group position={[0, -2, 2]} rotation={[0, 0, 0]}>
                 {/* Real T-Shirt Model mapped to act as Shirt */}

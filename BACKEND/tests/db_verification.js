@@ -27,6 +27,10 @@ const runTests = async () => {
                 password_hash: 'hashed_password',
                 height: 180,
                 weight: 75,
+
+                shoulder: 45,
+                waist: 32,
+
                 body_type: 'athletic'
             };
             const userId = await User.create(testUser);
@@ -68,4 +72,5 @@ const runTests = async () => {
 };
 
 runTests();
+
 
