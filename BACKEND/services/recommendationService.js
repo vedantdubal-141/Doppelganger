@@ -1,6 +1,6 @@
 const { cosineSimilarity } = require('../utils/similarity');
 const { checkBodyTypeMatch } = require('../utils/bodyType');
-const Product = require('../models/productModel');
+const Design = require('../models/designModel');
 const User = require('../models/userModel');
 const fs = require('fs');
 const path = require('path');
@@ -21,9 +21,9 @@ const getRecommendations = async (userId, tags) => {
 
     let products;
     try {
-      products = await Product.getAll();
+      products = await Design.find();
     } catch (dbError) {
-      console.warn('Database product lookup failed, falling back to JSON data');
+      console.warn('MongoDB design lookup failed, falling back to JSON data');
       const dataPath = path.join(__dirname, '../data/products.json');
       const productsData = fs.readFileSync(dataPath, 'utf-8');
       products = JSON.parse(productsData);
@@ -34,10 +34,8 @@ const getRecommendations = async (userId, tags) => {
       // If product has embedding_vector, use cosine similarity (mocking tags -> vector)
       // If not, use simple tag inclusion
       let styleSimilarity = 0;
-      if (product.embedding_vector) {
-        const productEmbedding = typeof product.embedding_vector === 'string'
-          ? JSON.parse(product.embedding_vector)
-          : product.embedding_vector;
+      if (product.aesthetic_vector && product.aesthetic_vector.length > 0) {
+        const productEmbedding = product.aesthetic_vector;
 
         // Mocking a vector from tags for comparison if tags are provided
         // In a real app, an AI service would convert tags/query to a vector
