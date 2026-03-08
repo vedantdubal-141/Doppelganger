@@ -8,18 +8,18 @@ const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
  * plus fallback `image` field for backward compatibility.
  */
 const FALLBACK_PRODUCTS = [
-    { id: 1, name: 'Streetwear Jacket', style: 'streetwear', category: 'jacket', color: '#FF6B35', image: '/images/jacket.jpg', image_url: null, popularity: 8, popularity_score: 8 },
-    { id: 2, name: 'Casual Hoodie', style: 'casual', category: 'hoodie', color: '#4ECDC4', image: '/images/hoodie.jpg', image_url: null, popularity: 6, popularity_score: 6 },
-    { id: 3, name: 'Formal Blazer', style: 'formal', category: 'blazer', color: '#2D3436', image: '/images/blazer.jpg', image_url: null, popularity: 9, popularity_score: 9 },
-    { id: 4, name: 'Sportswear Track Pants', style: 'sportswear', category: 'pants', color: '#6C5CE7', image: '/images/track_pants.jpg', image_url: null, popularity: 7, popularity_score: 7 },
-    { id: 5, name: 'Vintage Denim', style: 'vintage', category: 'jeans', color: '#FDCB6E', image: '/images/denim.jpg', image_url: null, popularity: 8, popularity_score: 8 },
-    { id: 6, name: 'Summer Shorts', style: 'summer', category: 'shorts', color: '#E17055', image: '/images/shorts.jpg', image_url: null, popularity: 5, popularity_score: 5 },
-    { id: 7, name: 'Elegant Evening Gown', style: 'formal', category: 'dress', color: '#636E72', image: '/images/gown.jpg', image_url: null, popularity: 10, popularity_score: 10 },
-    { id: 8, name: 'Retro Sunglasses', style: 'vintage', category: 'accessory', color: '#E8A87C', image: '/images/sunglasses.jpg', image_url: null, popularity: 7, popularity_score: 7 },
-    { id: 9, name: 'Active Sneakers', style: 'sportswear', category: 'shoes', color: '#A29BFE', image: '/images/sneakers.jpg', image_url: null, popularity: 9, popularity_score: 9 },
-    { id: 10, name: 'Denim Jacket', style: 'casual', category: 'jacket', color: '#74B9FF', image: '/images/denim_jacket.jpg', image_url: null, popularity: 8, popularity_score: 8 },
-    { id: 11, name: 'Graphic Tee', style: 'streetwear', category: 'tshirt', color: '#FD79A8', image: '/images/graphic_tee.jpg', image_url: null, popularity: 9, popularity_score: 9 },
-    { id: 12, name: 'Beach Shirt', style: 'summer', category: 'shirt', color: '#55EFC4', image: '/images/beach_shirt.jpg', image_url: null, popularity: 6, popularity_score: 6 },
+    { _id: 'fallback_1', id: 1, name: 'Streetwear Jacket', category: 'outerwear', style: 'streetwear', image_url: '/images/jacket.jpg', tags: ['streetwear', 'urban', 'outerwear'], aesthetic_vector: [0.8, 0.2, 0.1, 0.5], popularity_score: 8 },
+    { _id: 'fallback_2', id: 2, name: 'Casual Hoodie', category: 'outerwear', style: 'casual', image_url: '/images/hoodie.jpg', tags: ['casual', 'comfortable', 'hoodie'], aesthetic_vector: [0.3, 0.4, 0.2, 0.1], popularity_score: 6 },
+    { _id: 'fallback_3', id: 3, name: 'Formal Blazer', category: 'outerwear', style: 'formal', image_url: '/images/blazer.jpg', tags: ['formal', 'classic', 'office'], aesthetic_vector: [0.1, 0.9, 0.2, 0.3], popularity_score: 9 },
+    { _id: 'fallback_4', id: 4, name: 'Sportswear Track Pants', category: 'pants', style: 'sportswear', image_url: '/images/track_pants.jpg', tags: ['sport', 'active', 'pants'], aesthetic_vector: [0.2, 0.1, 0.7, 0.6], popularity_score: 7 },
+    { _id: 'fallback_5', id: 5, name: 'Vintage Denim', category: 'pants', style: 'vintage', image_url: '/images/denim.jpg', tags: ['vintage', 'denim', 'classic'], aesthetic_vector: [0.4, 0.5, 0.3, 0.8], popularity_score: 8 },
+    { _id: 'fallback_6', id: 6, name: 'Summer Shorts', category: 'pants', style: 'summer', image_url: '/images/shorts.jpg', tags: ['summer', 'beach', 'casual'], aesthetic_vector: [0.1, 0.2, 0.5, 0.4], popularity_score: 5 },
+    { _id: 'fallback_7', id: 7, name: 'Elegant Evening Gown', category: 'dress', style: 'formal', image_url: '/images/gown.jpg', tags: ['elegant', 'formal', 'night'], aesthetic_vector: [0.05, 0.95, 0.1, 0.2], popularity_score: 10 },
+    { _id: 'fallback_8', id: 8, name: 'Retro Sunglasses', category: 'accessory', style: 'vintage', image_url: '/images/sunglasses.jpg', tags: ['retro', 'vintage', 'summer'], aesthetic_vector: [0.5, 0.3, 0.2, 0.7], popularity_score: 7 },
+    { _id: 'fallback_9', id: 9, name: 'Active Sneakers', category: 'footwear', style: 'sportswear', image_url: '/images/sneakers.jpg', tags: ['sport', 'active', 'footwear'], aesthetic_vector: [0.2, 0.1, 0.9, 0.5], popularity_score: 9 },
+    { _id: 'fallback_10', id: 10, name: 'Denim Jacket', category: 'outerwear', style: 'casual', image_url: '/images/denim_jacket.jpg', tags: ['denim', 'casual', 'classic'], aesthetic_vector: [0.4, 0.4, 0.3, 0.5], popularity_score: 8 },
+    { _id: 'fallback_11', id: 11, name: 'Graphic Tee', category: 'shirt', style: 'streetwear', image_url: '/images/graphic_tee.jpg', tags: ['graphic', 'streetwear', 'urban'], aesthetic_vector: [0.7, 0.2, 0.2, 0.6], popularity_score: 9 },
+    { _id: 'fallback_12', id: 12, name: 'Beach Shirt', category: 'shirt', style: 'summer', image_url: '/images/beach_shirt.jpg', tags: ['summer', 'beach', 'casual'], aesthetic_vector: [0.2, 0.3, 0.6, 0.4], popularity_score: 6 },
 ];
 
 /**
@@ -42,7 +42,7 @@ export async function getProducts() {
  */
 export async function getProductById(productId) {
     const products = await getProducts();
-    return products.find((p) => String(p.id) === String(productId)) || null;
+    return products.find((p) => String(p._id) === String(productId) || String(p.id) === String(productId)) || null;
 }
 
 export default { getProducts, getProductById };

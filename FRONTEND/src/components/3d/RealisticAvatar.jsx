@@ -1,14 +1,14 @@
 import React, { useRef, useMemo, useEffect } from 'react';
-import { useFrame } from '@react-three/fiber';
+import { useFrame, createPortal } from '@react-three/fiber';
 import { useGLTF, useAnimations } from '@react-three/drei';
 import * as THREE from 'three';
 
 /**
  * RealisticAvatar — Replaces the primitive shape mannequin.
  * Loads a realistic rigged humanoid (Xbot), scales its bones dynamically based on biometrics,
- * and changes its material color to simulate a seamless futuristic clothing layer.
+ * and attaches physical 3D geometric parts (cyber armor, visors, etc) based on the garment category.
  */
-export default function RealisticAvatar({ measurements = {}, clothingColor = '#00F0FF', style = 'streetwear' }) {
+export default function RealisticAvatar({ measurements = {}, clothingColor = '#00F0FF', style = 'streetwear', category = 'none' }) {
     // Load the GLTF. The path must be relative to the public folder.
     const { scene, animations, nodes, materials } = useGLTF('/models/avatar.glb');
 
@@ -94,9 +94,79 @@ export default function RealisticAvatar({ measurements = {}, clothingColor = '#0
         });
     });
 
+    // Extract dynamic 3D parts based on category
+    const outerwearParts = nodes?.mixamorigSpine2 && ['outerwear', 'jacket', 'hoodie'].includes(category) ? (
+        createPortal(
+            <group position={[0, 15, 5]} rotation={[0.2, 0, 0]}>
+                {/* Chest Armor Plate */}
+                <mesh castShadow receiveShadow>
+                    <boxGeometry args={[35, 25, 10]} />
+                    <meshStandardMaterial color={currentColor.current} roughness={0.2} metalness={0.8} />
+                </mesh>
+                {/* Shoulder Guards */}
+                <mesh position={[-20, 10, -5]} rotation={[0, 0, 0.4]} castShadow receiveShadow>
+                    <cylinderGeometry args={[8, 8, 15, 16]} />
+                    <meshStandardMaterial color={currentColor.current} roughness={0.3} metalness={0.7} />
+                </mesh>
+                <mesh position={[20, 10, -5]} rotation={[0, 0, -0.4]} castShadow receiveShadow>
+                    <cylinderGeometry args={[8, 8, 15, 16]} />
+                    <meshStandardMaterial color={currentColor.current} roughness={0.3} metalness={0.7} />
+                </mesh>
+            </group>,
+            nodes.mixamorigSpine2
+        )
+    ) : null;
+
+    const pantsParts = nodes?.mixamorigHips && ['pants', 'shorts', 'jeans'].includes(category) ? (
+        createPortal(
+            <group position={[0, -5, 5]}>
+                {/* Tech Belt */}
+                <mesh castShadow receiveShadow>
+                    <boxGeometry args={[40, 5, 25]} />
+                    <meshStandardMaterial color="#2d2d2d" roughness={0.5} metalness={0.9} />
+                </mesh>
+                <mesh position={[0, 0, 13]}>
+                    <boxGeometry args={[10, 8, 2]} />
+                    <meshStandardMaterial color={currentColor.current} emissive={currentColor.current} emissiveIntensity={0.5} />
+                </mesh>
+            </group>,
+            nodes.mixamorigHips
+        )
+    ) : null;
+
+    const accessoryParts = nodes?.mixamorigHead && category === 'accessory' ? (
+        createPortal(
+            <group position={[0, 12, 10]}>
+                {/* Cyber Visor */}
+                <mesh castShadow receiveShadow>
+                    <boxGeometry args={[18, 5, 15]} />
+                    <meshStandardMaterial color={currentColor.current} metalness={0.9} roughness={0.1} opacity={0.8} transparent />
+                </mesh>
+            </group>,
+            nodes.mixamorigHead
+        )
+    ) : null;
+
+    const shirtParts = nodes?.mixamorigSpine2 && ['shirt', 'tshirt'].includes(category) ? (
+        createPortal(
+            <group position={[0, 8, 8]}>
+                {/* Glowing Core reactor / Base Shirt layer proxy */}
+                <mesh castShadow receiveShadow>
+                    <cylinderGeometry args={[8, 8, 4, 32]} />
+                    <meshStandardMaterial color={currentColor.current} emissive={currentColor.current} emissiveIntensity={0.8} />
+                </mesh>
+            </group>,
+            nodes.mixamorigSpine2
+        )
+    ) : null;
+
     return (
         <group dispose={null}>
             <primitive object={scene} castShadow receiveShadow />
+            {outerwearParts}
+            {pantsParts}
+            {accessoryParts}
+            {shirtParts}
         </group>
     );
 }

@@ -45,7 +45,7 @@ const VirtualTryOn = () => {
         setAllProducts(products);
 
         if (productId) {
-          const found = products.find(p => String(p.id) === String(productId));
+          const found = products.find(p => String(p._id) === String(productId) || String(p.id) === String(productId));
           setSelectedProduct(found || products[0] || null);
         } else if (products.length > 0) {
           setSelectedProduct(products[0]);
@@ -112,12 +112,13 @@ const VirtualTryOn = () => {
 
             <div className="flex flex-row lg:flex-col gap-2 overflow-x-auto lg:overflow-y-auto lg:max-h-[calc(100vh-280px)] pb-2">
               {allProducts.map((product) => {
-                const isActive = selectedProduct?.id === product.id;
+                const uniqueId = product._id || product.id;
+                const isActive = (selectedProduct?._id || selectedProduct?.id) === uniqueId;
                 const pColor = product.color || STYLE_COLORS[product.style] || STYLE_COLORS.default;
 
                 return (
                   <button
-                    key={product.id}
+                    key={uniqueId}
                     onClick={() => setSelectedProduct(product)}
                     className={`flex-shrink-0 w-44 lg:w-full flex items-center gap-3 p-3 rounded-lg transition-all duration-300 text-left ${isActive
                       ? 'bg-neon-cyan/10 border border-neon-cyan/50 shadow-[0_0_15px_rgba(0,240,255,0.15)]'
@@ -195,11 +196,13 @@ const VirtualTryOn = () => {
                     measurements={measurements}
                     clothingColor={clothingColor}
                     style={selectedProduct.style || 'default'}
+                    category={selectedProduct.category}
                   />
                 ) : (
                   <RealisticAvatar
                     measurements={measurements}
                     clothingColor="#1a1a1a"
+                    category="none"
                   />
                 )}
               </Scene>
