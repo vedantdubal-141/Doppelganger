@@ -1,22 +1,11 @@
 import React, { useRef, useMemo, useEffect } from 'react';
-<<<<<<< HEAD
-import { useFrame } from '@react-three/fiber';
-=======
 import { useFrame, createPortal } from '@react-three/fiber';
->>>>>>> pr-13
 import { useGLTF, useAnimations } from '@react-three/drei';
 import * as THREE from 'three';
 
 /**
  * RealisticAvatar — Replaces the primitive shape mannequin.
  * Loads a realistic rigged humanoid (Xbot), scales its bones dynamically based on biometrics,
-<<<<<<< HEAD
- * and changes its material color to simulate a seamless futuristic clothing layer.
- */
-export default function RealisticAvatar({ measurements = {}, clothingColor = '#00F0FF', style = 'streetwear' }) {
-    // Load the GLTF. The path must be relative to the public folder.
-    const { scene, animations, nodes, materials } = useGLTF('/models/avatar.glb');
-=======
  * and attaches physical 3D geometric parts (cyber armor, visors, etc) based on the full outfit.
  */
 export default function RealisticAvatar({ measurements = {}, outfitColors = {} }) {
@@ -30,7 +19,6 @@ export default function RealisticAvatar({ measurements = {}, outfitColors = {} }
             console.log("SHIRT BOUNDING BOX:", JSON.stringify(shirtModel.nodes.T_Shirt_male.geometry.boundingBox));
         }
     }, [shirtModel]);
->>>>>>> pr-13
 
     // Setup idle animation if present
     const { actions } = useAnimations(animations, scene);
@@ -81,19 +69,6 @@ export default function RealisticAvatar({ measurements = {}, outfitColors = {} }
 
     }, [measurements, nodes, scene]);
 
-<<<<<<< HEAD
-    // Handle Clothing/Material color overrides
-    const targetColor = useRef(new THREE.Color(clothingColor));
-    const currentColor = useRef(new THREE.Color(clothingColor));
-
-    useEffect(() => {
-        targetColor.current.set(clothingColor);
-    }, [clothingColor]);
-
-    useFrame(() => {
-        // Smooth lerp color
-        currentColor.current.lerp(targetColor.current, 0.1);
-=======
     // Handle Clothing/Material color overrides for multiple layers
     const targetColors = useRef({
         outerwear: new THREE.Color(),
@@ -132,28 +107,17 @@ export default function RealisticAvatar({ measurements = {}, outfitColors = {} }
         ['outerwear', 'pants', 'accessory', 'shirt', 'footwear', 'baseSkin'].forEach(cat => {
             currentColors.current[cat].lerp(targetColors.current[cat], 0.1);
         });
->>>>>>> pr-13
 
         // Traverse scene and apply to specific Xbot materials (Alpha_Surface is the outer shell)
         scene.traverse((child) => {
             if (child.isMesh && child.material) {
-<<<<<<< HEAD
-                // Xbot has two main materials: 'Alpha_Surface' and 'Alpha_Joints'
-                if (child.material.name === 'Alpha_Surface') {
-                    // Turn it into a neon fabric
-                    child.material.color.copy(currentColor.current);
-=======
                 if (child.material.name === 'Alpha_Surface') {
                     child.material.color.copy(currentColors.current.baseSkin);
->>>>>>> pr-13
                     child.material.roughness = 0.4;
                     child.material.metalness = 0.3;
                     child.material.needsUpdate = true;
                 } else if (child.material.name === 'Alpha_Joints') {
-<<<<<<< HEAD
-                    // Turn joints into dark chrome/cyber skeleton
-=======
->>>>>>> pr-13
+
                     child.material.color.setHex(0x1a1a1a);
                     child.material.roughness = 0.2;
                     child.material.metalness = 0.8;
@@ -163,11 +127,6 @@ export default function RealisticAvatar({ measurements = {}, outfitColors = {} }
         });
     });
 
-<<<<<<< HEAD
-    return (
-        <group dispose={null}>
-            <primitive object={scene} castShadow receiveShadow />
-=======
     // Extract dynamic 3D parts based on active outfit
     const outerwearParts = nodes?.mixamorigSpine2 && outfitColors['outerwear'] ? (
         createPortal(
@@ -282,13 +241,9 @@ export default function RealisticAvatar({ measurements = {}, outfitColors = {} }
             {accessoryParts}
             {shirtParts}
             {footwearParts}
->>>>>>> pr-13
         </group>
     );
 }
 
 useGLTF.preload('/models/avatar.glb');
-<<<<<<< HEAD
-=======
 useGLTF.preload('/models/shirt_baked.glb');
->>>>>>> pr-13
