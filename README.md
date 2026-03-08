@@ -5,11 +5,11 @@
   
   *The ultimate cyber-wardrobe network. Analyze your past purchases, generate physical coordinate vectors, and virtually try on user-published styles in a fully immersive 3D mirror.*
 
-  [![Status](https://img.shields.io/badge/status-active-success.svg)]()
-  [![React](https://img.shields.io/badge/React-20232A?style=flat&logo=react&logoColor=61DAFB)]()
-  [![Three.js](https://img.shields.io/badge/Three.js-black?style=flat&logo=three.js&logoColor=white)]()
-  [![Node.js](https://img.shields.io/badge/Node.js-43853D?style=flat&logo=node.js&logoColor=white)]()
-  [![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=flat&logo=tailwind-css&logoColor=white)]()
+[![Status](https://img.shields.io/badge/status-active-success.svg)]()
+[![React](https://img.shields.io/badge/React-20232A?style=flat&logo=react&logoColor=61DAFB)]()
+[![Three.js](https://img.shields.io/badge/Three.js-black?style=flat&logo=three.js&logoColor=white)]()
+[![Node.js](https://img.shields.io/badge/Node.js-43853D?style=flat&logo=node.js&logoColor=white)]()
+[![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=flat&logo=tailwind-css&logoColor=white)]()
 
 </div>
 
@@ -30,6 +30,7 @@
 StyleForge relies on a robust and modern stack separated into robust micro-environments:
 
 ### **Frontend Interface**
+
 - **React.js (Vite)** — Lightning-fast component rendering and hot-module replacement.
 - **TailwindCSS** — Rapid utility-first styling for our neon-cyberpunk aesthetic.
 - **Lucide-React** — Crisp, clean, minimal SVG icons.
@@ -39,6 +40,7 @@ StyleForge relies on a robust and modern stack separated into robust micro-envir
 - **Framer Motion** — (Optional) Smooth page transitions and micro-animations.
 
 ### **Backend Server**
+
 - **Node.js & Express.js** — The foundation of our fast, non-blocking REST API.
 - **MySQL2** — Promise-based SQL driver for robust relational data mapping.
 - **MongoDB & Mongoose** — NoSQL database for unstructured and flexible AI-generated aesthetic vectors.
@@ -95,11 +97,13 @@ StyleForge/
 ## ⚙️ Initialization Sequence (Installation)
 
 ### Prerequisites
+
 - [Node.js](https://nodejs.org/) (v16+)
 - A running MySQL Database Server
 - A running MongoDB Cluster (Local or remote via MongoDB Atlas)
 
 ### 1. Database Setup
+
 1. **MySQL**: Launch your MySQL client (e.g., XAMPP, phpMyAdmin, or MySQL CLI) and create a database named `fashion_ai`:
    ```sql
    CREATE DATABASE fashion_ai;
@@ -107,13 +111,17 @@ StyleForge/
 2. **MongoDB**: Secure your MongoDB connection URI (e.g., `mongodb://localhost:27017/fashion_ai` or your Atlas cluster URI).
 
 ### 2. Booting the Backend
+
 Navigate to the server directory and configure your environment:
+
 ```bash
 cd BACKEND
 cp .env.example .env
 npm install
 ```
+
 Inside `.env`, ensure the credentials match your local MySQL and MongoDB configurations:
+
 ```env
 PORT=5000
 DB_HOST=localhost
@@ -123,21 +131,28 @@ DB_NAME=fashion_ai
 MONGO_URI=mongodb://localhost:27017/fashion_ai
 JWT_SECRET=super_secret_cyber_key
 ```
+
 Ignite the server:
+
 ```bash
 npm run dev
 ```
 
 ### 3. Booting the Frontend
+
 Open a new terminal node and initialize the client:
+
 ```bash
 cd FRONTEND
 npm install
 ```
+
 Start the React interface:
+
 ```bash
 npm run dev
 ```
+
 **Access the grid at**: [http://localhost:5173](http://localhost:5173)
 
 ---
@@ -147,13 +162,14 @@ npm run dev
 The core team responsible for forging this architecture:
 
 - **[Rishab](https://github.com/rishab11250)**
-  *Leader, 2D UI Elements, AI Integration*
+  _Leader, 2D UI Elements, AI Integration_
 - **[Vineet](https://github.com/vineet1cg)**
-  *3D UI Elements, 3D Model Engineering*
+  _3D UI Elements, 3D Model Engineering_
 - **[Sahil](https://github.com/sahilchaudhari32)**
-  *Data Handler, Database Manager*
+  _Data Handler, Database Manager_
 - **[Ankit](https://github.com/ankitkumar764)**
-  *Backend Handler, Test Runner*
+  _Backend Handler, Test Runner_
+- extra credit [Vedant](https://github.com/vedantdubal-141)\*\* Extra credit to @Vedant P. Dubal for helping us debug a stubborn GitHub connectivity issue during the hackathon. After tracing proxy and DNS problems, he suggested switching our Git remote to SSH — which fixed everything instantly.
 
 ---
 
