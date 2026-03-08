@@ -14,13 +14,13 @@ export const uploadImage = async (inspirations, purchases) => {
   }
 
   try {
-    const response = await axios.post(`${API_BASE}/api/analyze/upload`, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
+    const token = localStorage.getItem('styleforge_token');
+    const headers = { 'Content-Type': 'multipart/form-data' };
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+
+    const response = await axios.post(`${API_BASE}/api/analyze/upload`, formData, { headers });
     return response.data;
   } catch (error) {
-    throw new Error(error.response?.data?.error || 'Failed to upload images');
+    throw new Error(error.response?.data?.message || error.response?.data?.error || 'Failed to upload images');
   }
 };

@@ -5,7 +5,7 @@ const { uploadImage } = require('../controllers/uploadController');
 const { protect } = require('../middleware/authMiddleware');
 
 // POST /api/analyze/upload
-router.post('/upload', protect, upload.fields([
+router.post('/upload', upload.fields([
     { name: 'inspirations', maxCount: 10 },
     { name: 'purchases', maxCount: 10 }
 ]), uploadImage);
