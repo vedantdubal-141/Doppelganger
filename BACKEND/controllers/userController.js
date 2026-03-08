@@ -1,7 +1,8 @@
-<<<<<<< HEAD
 const User = require('../models/userModel');
 const { calculateBodyType } = require('../utils/bodyType');
+const db = require('../config/db');
 
+// --- Legacy User Routes ---
 const createUser = async (req, res, next) => {
     try {
         const { name, height, weight, shoulder_width, waist } = req.body;
@@ -52,9 +53,8 @@ const getUserProfile = async (req, res, next) => {
     }
 };
 
-module.exports = { createUser, getUserProfile };
-=======
-const db = require('../config/db');
+
+// --- New API Requirements Routes ---
 
 // @desc    Get user data
 // @route   GET /api/users/me
@@ -162,10 +162,12 @@ const removeSavedDesign = async (req, res) => {
     }
 };
 
+
 module.exports = {
+    createUser,
+    getUserProfile,
     getMe,
     updateBiometrics,
     saveDesign,
     removeSavedDesign
 };
->>>>>>> 6887f95 (feat(backend): Implement StyleForge API requirements (Part 1))

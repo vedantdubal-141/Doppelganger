@@ -6,13 +6,13 @@ const path = require('path');
 let dbPromise;
 
 async function getDb() {
-    if (!dbPromise) {
-        dbPromise = open({
-            filename: path.join(__dirname, 'test.db'),
-            driver: sqlite3.Database
-        }).then(async (db) => {
-            // Run migrations
-            await db.exec(`
+  if (!dbPromise) {
+    dbPromise = open({
+      filename: path.join(__dirname, 'test.db'),
+      driver: sqlite3.Database
+    }).then(async (db) => {
+      // Run migrations
+      await db.exec(`
           CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             username VARCHAR(50) UNIQUE,
@@ -26,18 +26,8 @@ async function getDb() {
             joined_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
           );
 
-<<<<<<< HEAD
-// Test connection
-db.getConnection()
-    .then(connection => {
-        console.log('✅ MySQL Database connected successfully');
-        connection.release();
-    })
-    .catch(err => {
-        console.log('ℹ️  Running in Mock Mode: MySQL Database not detected. Falling back to local data.');
-        // Don't log the raw error to keep console clean for demo
-    });
-=======
+
+
           CREATE TABLE IF NOT EXISTS designs (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name VARCHAR(255),
@@ -48,7 +38,6 @@ db.getConnection()
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY(author_id) REFERENCES users(id)
           );
->>>>>>> 6887f95 (feat(backend): Implement StyleForge API requirements (Part 1))
 
           CREATE TABLE IF NOT EXISTS design_tags (
             design_id INTEGER,
@@ -85,42 +74,42 @@ db.getConnection()
           );
         `);
 
-            // Seed some dummy product data for testing Ankit's filters
-            const { count } = await db.get('SELECT COUNT(*) as count FROM products');
-            if (count === 0) {
-                await db.run(`INSERT INTO products (name, category, style, color, popularity_score) VALUES 
+      // Seed some dummy product data for testing Ankit's filters
+      const { count } = await db.get('SELECT COUNT(*) as count FROM products');
+      if (count === 0) {
+        await db.run(`INSERT INTO products (name, category, style, color, popularity_score) VALUES 
                 ('Black Jacket', 'jacket', 'streetwear', 'black', 0.8),
                 ('Blue Jeans', 'pants', 'casual', 'blue', 0.9),
                 ('Red Dress', 'dress', 'party', 'red', 0.6)
             `);
-            }
+      }
 
-            console.log('Connected to local SQLite database for testing.');
-            return db;
-        });
-    }
-    return dbPromise;
+      console.log('Connected to local SQLite database for testing.');
+      return db;
+    });
+  }
+  return dbPromise;
 }
 
 // Mocking the mysql2 pool interface that Ankit wrote in controllers
 const poolMock = {
-    getConnection: async () => {
-        const db = await getDb();
-        return { release: () => { } };
-    },
-    query: async (queryStr, params) => {
-        const db = await getDb();
-        // Translate MySQL '?' to SQLite param array
-        const result = await db.all(queryStr, params);
+  getConnection: async () => {
+    const db = await getDb();
+    return { release: () => { } };
+  },
+  query: async (queryStr, params) => {
+    const db = await getDb();
+    // Translate MySQL '?' to SQLite param array
+    const result = await db.all(queryStr, params);
 
-        // In mysql2, insert queries return an object with insertId in the first element of an array
-        if (queryStr.trim().toUpperCase().startsWith('INSERT')) {
-            const { lastID } = await db.run(queryStr, params);
-            return [{ insertId: lastID }];
-        }
-
-        return [result]; // mysql2 returns [rows, fields]
+    // In mysql2, insert queries return an object with insertId in the first element of an array
+    if (queryStr.trim().toUpperCase().startsWith('INSERT')) {
+      const { lastID } = await db.run(queryStr, params);
+      return [{ insertId: lastID }];
     }
+
+    return [result]; // mysql2 returns [rows, fields]
+  }
 };
 
 // Initialize DB when this file is required
