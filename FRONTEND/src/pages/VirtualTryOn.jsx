@@ -224,11 +224,13 @@ const VirtualTryOn = () => {
                   <RealisticAvatar
                     measurements={measurements}
                     outfitColors={outfitColors}
+                    outfit={outfit}
                   />
                 ) : (
                   <RealisticAvatar
                     measurements={measurements}
                     outfitColors={{}}
+                    outfit={{}}
                   />
                 )}
               </Scene>
@@ -255,7 +257,10 @@ const VirtualTryOn = () => {
                   className="mb-6 p-3 rounded-lg bg-neon-purple/5 border border-neon-purple/20"
                 >
                   <p className="font-space text-xs text-chrome-400 uppercase mb-1">Active Garment</p>
-                  <p className="font-orbitron text-sm text-chrome-100 mb-2">{selectedProduct.name}</p>
+                  <p className="font-orbitron text-sm text-chrome-100 mb-1">{selectedProduct.name}</p>
+                  {selectedProduct.price && (
+                    <p className="font-orbitron text-xs text-neon-cyan mb-2">${selectedProduct.price}</p>
+                  )}
                   <div className="flex items-center gap-2">
                     <div
                       className="w-5 h-5 rounded-md border border-white/20 shadow-inner"
@@ -270,6 +275,11 @@ const VirtualTryOn = () => {
                       </span>
                     )}
                   </div>
+                  {selectedProduct.description && (
+                    <p className="font-space text-[10px] text-chrome-500 mt-2 leading-relaxed">
+                      {selectedProduct.description}
+                    </p>
+                  )}
                   {selectedProduct.score && (
                     <div className="flex items-center gap-1 mt-2 text-neon-pink">
                       <Sparkles className="w-3 h-3" />
