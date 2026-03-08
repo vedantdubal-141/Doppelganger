@@ -4,18 +4,22 @@ import * as THREE from 'three';
 
 /**
  * Avatar — Procedural mannequin built from primitive meshes.
- * Accepts a `measurements` prop to dynamically resize body parts.
  *
- * measurements = { height, chest, waist, hips, shoulders, armLength, legLength }
- * All values are in cm. The mannequin uses baseline proportions and scales
- * each body segment relative to the baseline.
+ * This component renders ONLY the body (skin-tone).
+ * Clothing is handled entirely by ClothingMesh, which overlays
+ * on top. This separation ensures the avatar stays stable and
+ * only the clothing shell changes when the user selects products.
  *
- * If a real base_avatar.glb is added later, swap this with useGLTF.
+ * Accepts biometric measurements from AuthContext:
+ *   { height (cm), weight (kg), shoulderWidth (cm), waist (cm) }
+ *
+ * Derives chest, hips, armLength, legLength using anthropometric ratios.
  */
 
 /* ── Baseline measurements (average adult, cm) ── */
 const BASELINE = {
     height: 175,
+    weight: 70,
     chest: 96,
     waist: 82,
     hips: 96,
@@ -24,28 +28,67 @@ const BASELINE = {
     legLength: 80,
 };
 
-const BODY_MATERIAL = new THREE.MeshStandardMaterial({
-    color: '#1a1a2e',
-    metalness: 0.6,
-    roughness: 0.3,
+/**
+ * Derive full body measurements from the 4 biometric inputs.
+ */
+export function deriveMeasurements({ height = 175, weight = 70, shoulderWidth = 46, waist = 82 }) {
+    const h = Number(height) || 175;
+    const w = Number(weight) || 70;
+    const sw = Number(shoulderWidth) || 46;
+    const wa = Number(waist) || 82;
+
+    const bmi = w / ((h / 100) ** 2);
+    const bmiFactor = Math.max(0.8, Math.min(1.4, bmi / 22));
+
+    return {
+        height: h,
+        chest: wa * 1.15 * bmiFactor,
+        waist: wa,
+        hips: wa * 1.08 * bmiFactor,
+        shoulders: sw,
+        armLength: h * 0.34,
+        legLength: h * 0.46,
+    };
+}
+
+export function computeScale(derived) {
+    return {
+        height: derived.height / BASELINE.height,
+        chest: derived.chest / BASELINE.chest,
+        waist: derived.waist / BASELINE.waist,
+        hips: derived.hips / BASELINE.hips,
+        shoulders: derived.shoulders / BASELINE.shoulders,
+        arm: derived.armLength / BASELINE.armLength,
+        leg: derived.legLength / BASELINE.legLength,
+    };
+}
+
+/* ── Materials ── */
+const SKIN_MATERIAL = new THREE.MeshStandardMaterial({
+    color: '#c4956a',
+    metalness: 0.05,
+    roughness: 0.65,
 });
 
-function Avatar({ clothingColor = '#7B61FF', measurements = {} }) {
+const HAIR_MATERIAL = new THREE.MeshStandardMaterial({
+    color: '#1a1a2e',
+    metalness: 0.3,
+    roughness: 0.5,
+});
+
+const SHOE_MATERIAL = new THREE.MeshStandardMaterial({
+    color: '#111111',
+    metalness: 0.4,
+    roughness: 0.4,
+});
+
+const EYE_MATERIAL = new THREE.MeshStandardMaterial({ color: '#222222' });
+
+function Avatar({ measurements = {} }) {
     const groupRef = useRef();
 
-    /* ── Compute scale factors from measurements ── */
-    const scale = useMemo(() => {
-        const m = { ...BASELINE, ...measurements };
-        return {
-            height: m.height / BASELINE.height,
-            chest: m.chest / BASELINE.chest,
-            waist: m.waist / BASELINE.waist,
-            hips: m.hips / BASELINE.hips,
-            shoulders: m.shoulders / BASELINE.shoulders,
-            arm: m.armLength / BASELINE.armLength,
-            leg: m.legLength / BASELINE.legLength,
-        };
-    }, [measurements]);
+    const derived = useMemo(() => deriveMeasurements(measurements), [measurements]);
+    const scale = useMemo(() => computeScale(derived), [derived]);
 
     // Subtle idle breathing animation
     useFrame((state) => {
@@ -55,18 +98,6 @@ function Avatar({ clothingColor = '#7B61FF', measurements = {} }) {
                 baseY + Math.sin(state.clock.elapsedTime * 1.5) * 0.02;
         }
     });
-
-    const clothingMat = useMemo(
-        () =>
-            new THREE.MeshStandardMaterial({
-                color: clothingColor,
-                metalness: 0.4,
-                roughness: 0.35,
-                transparent: true,
-                opacity: 0.92,
-            }),
-        [clothingColor]
-    );
 
     /* ── Derived dimensions ── */
     const torsoRadiusTop = 0.28 * scale.chest;
@@ -90,6 +121,7 @@ function Avatar({ clothingColor = '#7B61FF', measurements = {} }) {
     const upperLegY = 0.35 * scale.height;
     const lowerLegY = -0.02 * scale.height;
 
+    const headRadius = 0.22;
     const headY = 1.85 * scale.height;
     const neckY = 1.58 * scale.height;
     const shoeY = -0.18 * scale.height;
@@ -97,81 +129,112 @@ function Avatar({ clothingColor = '#7B61FF', measurements = {} }) {
     return (
         <group ref={groupRef} position={[0, -1.2 * scale.height, 0]}>
             {/* ── Head ── */}
-            <mesh position={[0, headY, 0]} material={BODY_MATERIAL}>
-                <sphereGeometry args={[0.22, 32, 32]} />
+            <mesh position={[0, headY, 0]} material={SKIN_MATERIAL} castShadow>
+                <sphereGeometry args={[headRadius, 32, 32]} />
+            </mesh>
+
+            {/* ── Hair cap ── */}
+            <mesh position={[0, headY + 0.06, -0.02]} material={HAIR_MATERIAL}>
+                <sphereGeometry args={[headRadius * 1.02, 32, 16, 0, Math.PI * 2, 0, Math.PI / 2]} />
+            </mesh>
+
+            {/* ── Eyes ── */}
+            <mesh position={[-0.07, headY + 0.02, 0.18]} material={EYE_MATERIAL}>
+                <sphereGeometry args={[0.025, 16, 16]} />
+            </mesh>
+            <mesh position={[0.07, headY + 0.02, 0.18]} material={EYE_MATERIAL}>
+                <sphereGeometry args={[0.025, 16, 16]} />
             </mesh>
 
             {/* ── Neck ── */}
-            <mesh position={[0, neckY, 0]} material={BODY_MATERIAL}>
-                <cylinderGeometry args={[0.08, 0.1, 0.12, 16]} />
+            <mesh position={[0, neckY, 0]} material={SKIN_MATERIAL} castShadow>
+                <cylinderGeometry args={[0.08, 0.1, 0.15, 16]} />
             </mesh>
 
-            {/* ── Torso (clothing) ── */}
-            <mesh position={[0, torsoY, 0]} material={clothingMat}>
-                <cylinderGeometry args={[torsoRadiusTop, torsoRadiusBot, torsoHeight, 16]} />
+            {/* ── Torso (SKIN underneath clothing) ── */}
+            <mesh position={[0, torsoY, 0]} material={SKIN_MATERIAL} castShadow>
+                <cylinderGeometry args={[torsoRadiusTop - 0.01, torsoRadiusBot - 0.01, torsoHeight - 0.01, 20]} />
             </mesh>
 
-            {/* ── Hips ── */}
-            <mesh position={[0, hipY, 0]} material={clothingMat}>
-                <cylinderGeometry args={[hipRadiusTop, hipRadiusBot, 0.18, 16]} />
+            {/* ── Hips (SKIN underneath clothing) ── */}
+            <mesh position={[0, hipY, 0]} material={SKIN_MATERIAL} castShadow>
+                <cylinderGeometry args={[hipRadiusTop - 0.01, hipRadiusBot - 0.01, 0.18, 20]} />
             </mesh>
 
-            {/* ── Left arm ── */}
+            {/* ── Left upper arm (SKIN underneath) ── */}
             <mesh
                 position={[-shoulderOffset, armY, 0]}
                 rotation={[0, 0, 0.15]}
-                material={clothingMat}
+                material={SKIN_MATERIAL}
+                castShadow
             >
-                <cylinderGeometry args={[0.06, 0.07, armHeight, 12]} />
+                <cylinderGeometry args={[0.058, 0.063, armHeight - 0.01, 14]} />
             </mesh>
-            {/* Left forearm */}
+            {/* Left forearm (always exposed skin) */}
             <mesh
                 position={[-(shoulderOffset + 0.04), forearmY, 0]}
                 rotation={[0, 0, 0.08]}
-                material={BODY_MATERIAL}
+                material={SKIN_MATERIAL}
+                castShadow
             >
-                <cylinderGeometry args={[0.05, 0.06, forearmHeight, 12]} />
+                <cylinderGeometry args={[0.05, 0.055, forearmHeight, 14]} />
+            </mesh>
+            {/* Left hand */}
+            <mesh
+                position={[-(shoulderOffset + 0.06), forearmY - forearmHeight / 2 - 0.04, 0]}
+                material={SKIN_MATERIAL}
+            >
+                <sphereGeometry args={[0.045, 12, 12]} />
             </mesh>
 
-            {/* ── Right arm ── */}
+            {/* ── Right upper arm (SKIN underneath) ── */}
             <mesh
                 position={[shoulderOffset, armY, 0]}
                 rotation={[0, 0, -0.15]}
-                material={clothingMat}
+                material={SKIN_MATERIAL}
+                castShadow
             >
-                <cylinderGeometry args={[0.06, 0.07, armHeight, 12]} />
+                <cylinderGeometry args={[0.058, 0.063, armHeight - 0.01, 14]} />
             </mesh>
-            {/* Right forearm */}
+            {/* Right forearm (always exposed skin) */}
             <mesh
                 position={[shoulderOffset + 0.04, forearmY, 0]}
                 rotation={[0, 0, -0.08]}
-                material={BODY_MATERIAL}
+                material={SKIN_MATERIAL}
+                castShadow
             >
-                <cylinderGeometry args={[0.05, 0.06, forearmHeight, 12]} />
+                <cylinderGeometry args={[0.05, 0.055, forearmHeight, 14]} />
+            </mesh>
+            {/* Right hand */}
+            <mesh
+                position={[shoulderOffset + 0.06, forearmY - forearmHeight / 2 - 0.04, 0]}
+                material={SKIN_MATERIAL}
+            >
+                <sphereGeometry args={[0.045, 12, 12]} />
             </mesh>
 
-            {/* ── Left leg ── */}
-            <mesh position={[-legSpacing, upperLegY, 0]} material={clothingMat}>
-                <cylinderGeometry args={[0.09 * scale.hips, 0.08, upperLegH, 12]} />
+            {/* ── Left leg (SKIN underneath) ── */}
+            <mesh position={[-legSpacing, upperLegY, 0]} material={SKIN_MATERIAL} castShadow>
+                <cylinderGeometry args={[0.085 * scale.hips, 0.068, upperLegH - 0.01, 14]} />
             </mesh>
-            <mesh position={[-legSpacing, lowerLegY, 0]} material={BODY_MATERIAL}>
-                <cylinderGeometry args={[0.07, 0.06, lowerLegH, 12]} />
+            <mesh position={[-legSpacing, lowerLegY, 0]} material={SKIN_MATERIAL} castShadow>
+                <cylinderGeometry args={[0.065, 0.055, lowerLegH, 14]} />
             </mesh>
 
-            {/* ── Right leg ── */}
-            <mesh position={[legSpacing, upperLegY, 0]} material={clothingMat}>
-                <cylinderGeometry args={[0.09 * scale.hips, 0.08, upperLegH, 12]} />
+            {/* ── Right leg (SKIN underneath) ── */}
+            <mesh position={[legSpacing, upperLegY, 0]} material={SKIN_MATERIAL} castShadow>
+                <cylinderGeometry args={[0.085 * scale.hips, 0.068, upperLegH - 0.01, 14]} />
             </mesh>
-            <mesh position={[legSpacing, lowerLegY, 0]} material={BODY_MATERIAL}>
-                <cylinderGeometry args={[0.07, 0.06, lowerLegH, 12]} />
+            <mesh position={[legSpacing, lowerLegY, 0]} material={SKIN_MATERIAL} castShadow>
+                <cylinderGeometry args={[0.065, 0.055, lowerLegH, 14]} />
             </mesh>
 
             {/* ── Shoes ── */}
-            <mesh position={[-legSpacing, shoeY, 0.04]} material={BODY_MATERIAL}>
-                <boxGeometry args={[0.12, 0.06, 0.18]} />
+            <mesh position={[-legSpacing, shoeY, 0.04]} material={SHOE_MATERIAL} castShadow>
+                <boxGeometry args={[0.13, 0.07, 0.2]} />
             </mesh>
-            <mesh position={[legSpacing, shoeY, 0.04]} material={BODY_MATERIAL}>
-                <boxGeometry args={[0.12, 0.06, 0.18]} />
+            <mesh position={[legSpacing, shoeY, 0.04]} material={SHOE_MATERIAL} castShadow>
+                <boxGeometry args={[0.13, 0.07, 0.2]} />
             </mesh>
         </group>
     );
