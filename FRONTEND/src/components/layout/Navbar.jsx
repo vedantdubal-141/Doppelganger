@@ -1,8 +1,10 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { Scissors, Anvil, Scan, LayoutGrid, User, Home as HomeIcon } from 'lucide-react';
+import { Scissors, Anvil, Scan, LayoutGrid, User, Home as HomeIcon, LogIn, LogOut } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
 
 const Navbar = () => {
   const navigate = useNavigate();
+  const { isAuthenticated, user, logout } = useAuth();
   return (
     <nav className="fixed top-0 left-0 w-full z-50 glass-panel border-b-0 rounded-none bg-[rgba(11,11,15,0.8)] px-8 py-4 flex items-center justify-between">
       {/* Logo */}
@@ -31,10 +33,27 @@ const Navbar = () => {
 
       {/* Action Area */}
       <div className="flex items-center gap-4">
-        <button onClick={() => navigate('/profile')} className="chrome-button text-xs py-2 px-4 shadow-[0_0_15px_rgba(0,240,255,0.3)]">
-          <User className="w-4 h-4 inline-block mr-2" />
-          Profile
-        </button>
+        {isAuthenticated() ? (
+          <>
+            <button onClick={() => navigate('/profile')} className="chrome-button text-xs py-2 px-4 shadow-[0_0_15px_rgba(0,240,255,0.3)] flex items-center gap-2">
+              <User className="w-4 h-4" />
+              <span className="hidden sm:inline">{user.username}</span>
+            </button>
+            <button onClick={() => { logout(); navigate('/'); }} className="text-chrome-400 hover:text-neon-pink transition-colors p-2" title="Logout">
+              <LogOut className="w-5 h-5" />
+            </button>
+          </>
+        ) : (
+          <>
+            <Link to="/login" className="text-chrome-400 hover:text-neon-cyan transition-colors text-sm font-space uppercase tracking-widest hidden sm:block">
+              Login
+            </Link>
+            <button onClick={() => navigate('/signup')} className="chrome-button text-xs py-2 px-4 shadow-[0_0_15px_rgba(123,97,255,0.3)] border-neon-purple/50 bg-neon-purple/10">
+              <LogIn className="w-4 h-4 inline-block mr-2" />
+              Sign Up
+            </button>
+          </>
+        )}
       </div>
     </nav>
   );
