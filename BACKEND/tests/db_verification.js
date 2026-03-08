@@ -1,5 +1,9 @@
 const db = require('../config/db');
 const connectDB = require('../config/mongo');
+<<<<<<< HEAD
+=======
+const initMySQL = require('../scripts/init_mysql');
+>>>>>>> pr-12
 const User = require('../models/userModel');
 const Design = require('../models/designModel');
 const mongoose = require('mongoose');
@@ -8,6 +12,13 @@ const runTests = async () => {
     try {
         console.log('--- Database Verification Test ---');
 
+<<<<<<< HEAD
+=======
+        // Init tables first so tests can use them
+        console.log('\nInitializing MySQL tables...');
+        await initMySQL();
+
+>>>>>>> pr-12
         // 1. MySQL Test
         console.log('\nTesting MySQL...');
         const [rows] = await db.execute('SELECT 1 + 1 AS result');
@@ -21,7 +32,13 @@ const runTests = async () => {
                 password_hash: 'hashed_password',
                 height: 180,
                 weight: 75,
+<<<<<<< HEAD
                 body_type: 'athletic'
+=======
+                shoulder: 45,
+                waist: 32,
+                body_type: 'triangle'
+>>>>>>> pr-12
             };
             const userId = await User.create(testUser);
             console.log('✅ MySQL User Create: PASS (ID: ' + userId + ')');
@@ -54,6 +71,10 @@ const runTests = async () => {
         console.log('\n--- Verification Complete ---');
     } catch (err) {
         console.error('\n❌ Verification Failed:', err.message);
+<<<<<<< HEAD
+=======
+        process.exitCode = 1;
+>>>>>>> pr-12
     } finally {
         await mongoose.connection.close();
         process.exit();
@@ -61,3 +82,7 @@ const runTests = async () => {
 };
 
 runTests();
+<<<<<<< HEAD
+=======
+
+>>>>>>> pr-12

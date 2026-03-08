@@ -81,7 +81,7 @@ const loginUser = async (req, res) => {
                     biometrics: {
                         height: user.biometrics_height || null,
                         weight: user.biometrics_weight || null,
-                        shoulderWidth: user.biometrics_shoulder || null,
+                        shoulder: user.biometrics_shoulder || null,
                         waist: user.biometrics_waist || null
                     },
                     savedOutfits: savedOutfits || []

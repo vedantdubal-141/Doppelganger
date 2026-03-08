@@ -1,67 +1,47 @@
 /**
- * Image Generation Service - Together AI (FLUX.1-schnell)
+ * Image Generation Service - Hugging Face (FLUX.1-schnell)
  * Takes a text prompt from the Vision Service and generates
- * a novel fashion image using Together AI's FLUX model.
+ * a novel fashion image using Hugging Face's FLUX model.
  */
 const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
 
-const TOGETHER_API_URL = 'https://api.together.xyz/v1/images/generations';
-const IMAGE_MODEL = 'black-forest-labs/FLUX.1-schnell-Free';
+const HF_API_URL = 'https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell';
 
 /**
- * Generates a fashion image from a text prompt using Together AI's FLUX model.
+ * Generates a fashion image from a text prompt using Hugging Face's FLUX model.
  *
- * @param {string} prompt - The detailed fashion description prompt from visionService
- * @param {Object} options - Optional generation parameters
- * @param {number} options.width - Image width (default: 1024)
- * @param {number} options.height - Image height (default: 1024)
- * @param {number} options.steps - Number of diffusion steps (default: 4 for schnell)
- * @param {number} options.n - Number of images to generate (default: 1)
+ * @param {string} prompt - The fashion description prompt from visionService
  * @returns {Object} { image_url, image_base64 }
  */
 const generateImage = async (prompt, options = {}) => {
-  const apiKey = process.env.TOGETHER_API_KEY;
+  const apiKey = process.env.HF_TOKEN;
 
   if (!apiKey) {
-    console.warn('⚠️ TOGETHER_API_KEY not set. Returning mock generated image.');
+    console.warn('⚠️ HF_TOKEN not set in .env. Returning mock generated image.');
     return getMockImage();
   }
 
-  const {
-    width = 1024,
-    height = 1024,
-    steps = 4,
-    n = 1
-  } = options;
-
-  // Enhance the prompt with fashion-specific quality boosters
+  // HF's FLUX.1 [schnell] needs a quality prompt
   const enhancedPrompt = `${prompt}. Professional fashion photography, studio lighting, clean background, high resolution, editorial quality, 8k detail.`;
 
   try {
     const response = await axios.post(
-      TOGETHER_API_URL,
-      {
-        model: IMAGE_MODEL,
-        prompt: enhancedPrompt,
-        width,
-        height,
-        steps,
-        n,
-        response_format: 'b64_json'
-      },
+      HF_API_URL,
+      { inputs: enhancedPrompt },
       {
         headers: {
           'Authorization': `Bearer ${apiKey}`,
           'Content-Type': 'application/json'
         },
-        timeout: 60000
+        responseType: 'arraybuffer',
+        timeout: 90000
       }
     );
 
-    const imageData = response.data.data[0];
-    const base64Image = imageData.b64_json;
+    const imageBuffer = response.data;
+    const base64Image = Buffer.from(imageBuffer, 'binary').toString('base64');
 
     // Save the generated image to the uploads/generated/ directory
     const generatedDir = path.join(__dirname, '..', 'uploads', 'generated');
@@ -71,11 +51,11 @@ const generateImage = async (prompt, options = {}) => {
 
     const filename = `generated-${Date.now()}.png`;
     const filePath = path.join(generatedDir, filename);
-    fs.writeFileSync(filePath, Buffer.from(base64Image, 'base64'));
+    fs.writeFileSync(filePath, imageBuffer);
 
     const imageUrl = `/uploads/generated/${filename}`;
 
-    console.log('✅ Image generated successfully:', imageUrl);
+    console.log('✅ Image generated successfully by HF:', imageUrl);
 
     return {
       image_url: imageUrl,
@@ -83,7 +63,12 @@ const generateImage = async (prompt, options = {}) => {
     };
 
   } catch (error) {
-    console.error('❌ Image Generation Error:', error.response?.data || error.message);
+    // If error.response.data exists and is an arraybuffer, it needs decoding
+    const errorBody = error.response?.data instanceof Buffer 
+        ? error.response.data.toString() 
+        : error.message;
+
+    console.error('❌ HF Image Generation Error:', errorBody);
     console.warn('⚠️ Falling back to mock generated image.');
     return getMockImage();
   }

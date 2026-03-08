@@ -1,7 +1,30 @@
+<<<<<<< HEAD
 const db = require('../config/db');
 
 const initMySQL = async () => {
     try {
+=======
+const mysql = require('mysql2/promise');
+const db = require('../config/db');
+require('dotenv').config();
+
+const ensureDatabase = async () => {
+    // Create the database if it does not exist, using a temporary root connection
+    const conn = await mysql.createConnection({
+        host: process.env.DB_HOST || 'localhost',
+        user: process.env.DB_USER || 'root',
+        password: process.env.DB_PASSWORD || '',
+    });
+    await conn.execute(`CREATE DATABASE IF NOT EXISTS \`${process.env.DB_NAME || 'fashion_ai'}\``);
+    await conn.end();
+};
+
+
+const initMySQL = async () => {
+    try {
+        // Ensure the database itself exists before trying to create tables
+        await ensureDatabase();
+>>>>>>> pr-12
         console.log('⏳ Initializing MySQL Tables...');
 
         // 1. Users Table
