@@ -13,6 +13,7 @@ const runTests = async () => {
         console.log('\nInitializing MySQL tables...');
         await initMySQL();
 
+
         // 1. MySQL Test
         console.log('\nTesting MySQL...');
         const [rows] = await db.execute('SELECT 1 + 1 AS result');
@@ -26,8 +27,10 @@ const runTests = async () => {
                 password_hash: 'hashed_password',
                 height: 180,
                 weight: 75,
+
                 shoulder: 45,
                 waist: 32,
+
                 body_type: 'athletic'
             };
             const userId = await User.create(testUser);
@@ -69,3 +72,5 @@ const runTests = async () => {
 };
 
 runTests();
+
+

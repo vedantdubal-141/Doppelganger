@@ -120,6 +120,7 @@ export default function RealisticAvatar({ measurements = {}, outfitColors = {}, 
                     child.material.metalness = 0.3;
                     child.material.needsUpdate = true;
                 } else if (child.material.name === 'Alpha_Joints') {
+
                     child.material.color.setHex(0x1a1a1a);
                     child.material.roughness = 0.2;
                     child.material.metalness = 0.8;

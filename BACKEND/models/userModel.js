@@ -5,7 +5,7 @@ const User = {
         const { username, email, password_hash, height, weight, shoulder, waist, body_type, level } = userData;
         const [result] = await db.execute(
             'INSERT INTO users (username, email, password_hash, biometrics_height, biometrics_weight, biometrics_shoulder, biometrics_waist, body_type, level) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-            [username, email, password_hash, height, weight, shoulder, waist, body_type, level || 1]
+            [username, email, password_hash, height || null, weight || null, shoulder || null, waist || null, body_type || null, level || 1]
         );
         return result.insertId;
     },
