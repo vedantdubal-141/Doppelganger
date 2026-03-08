@@ -1,7 +1,9 @@
 const User = require('../models/userModel');
 const db = require('../config/db');
 const { calculateBodyType } = require('../utils/bodyType');
+const db = require('../config/db');
 
+// --- Legacy User Routes ---
 const createUser = async (req, res, next) => {
     try {
         const { username, email, password_hash, height, weight, shoulder, waist } = req.body;
@@ -54,6 +56,8 @@ const getUserProfile = async (req, res, next) => {
         next(error);
     }
 };
+
+// --- New API Requirements Routes ---
 
 // @desc    Get current user data
 // @route   GET /api/users/me
@@ -145,6 +149,7 @@ const removeSavedDesign = async (req, res) => {
         res.status(500).json({ message: 'Server error removing design' });
     }
 };
+
 
 module.exports = {
     createUser,
