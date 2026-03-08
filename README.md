@@ -55,24 +55,37 @@ The network is structurally divided into two primary nodes: `FRONTEND` and `BACK
 ```text
 StyleForge/
 ├── BACKEND/                    # Server node and database handlers
-│   ├── config/                 # DB connection logic
-│   ├── controllers/            # Route business logic (auth, user)
-│   ├── routes/                 # Express API endpoints
-│   ├── server.js               # Main server entry point
+│   ├── config/                 # Database connection logic & env validators
+│   ├── controllers/            # Route business logic (auth, user profiles)
+│   ├── data/                   # Initial seed data and json configurations
+│   ├── dataset/                # Machine learning datasets and CSV embeddings
+│   ├── middleware/             # Express handlers (JWT verification, logging)
+│   ├── models/                 # Database schemas (Mongoose & MySQL wrappers)
+│   ├── routes/                 # Express API URL endpoint definitions
+│   ├── scripts/                # Database migration and utility scripts
+│   ├── services/               # Core backend services and 3rd-party integrations
+│   ├── tests/                  # Unit tests and automated endpoint runners
+│   ├── utils/                  # Helper functions (encryption, formatting)
+│   ├── server.js               # Main Express.js server entry point
 │   └── .env.example            # Environment configurations (JWT secrets, DB pass)
 │
-├── FRONTEND/                   # Client interface and 3D mirror
-│   ├── public/                 # Static assets (3D GLTF models, fonts)
+├── FRONTEND/                   # Client interface and 3D mirror environment
+│   ├── public/                 # Static assets
+│   │   ├── models/             # 3D GLTF/GLB models (Realistic avatar, clothing primitives)
+│   │   └── fonts/              # Custom cyberpunk and neon typography
 │   └── src/
+│       ├── assets/             # Images, SVGs, and brand material
 │       ├── components/         # Reusable UI React blocks
-│       │   ├── 3d/             # Three.js environments and RealisticAvatar
-│       │   ├── layout/         # Grid wrappers (Navbar, Sidebar)
-│       │   └── ui/             # Atomic components (GlassCard, ChromeButton)
-│       ├── context/            # React Contexts (Global Auth State)
-│       ├── pages/              # Primary views (Login, Signup, TryOn, Dashboard)
-│       ├── services/           # Axios network calls to the Backend API
-│       ├── App.jsx             # React Router Hub
-│       └── index.css           # Global neon typography and Tailwind injections
+│       │   ├── 3d/             # Three.js environments (Scene.jsx, RealisticAvatar.jsx, Clothing.jsx)
+│       │   ├── layout/         # Grid wrappers (Navbar, Sidebar, Footer)
+│       │   └── ui/             # Atomic components (GlassCard, ChromeButton, NeonInputs)
+│       ├── context/            # React Contexts (Global Auth State, Outfits State)
+│       ├── pages/              # Primary views (Login, Signup, VirtualTryOn, Profile, Dashboard)
+│       ├── services/           # Axios network calls (Product API, Auth Interface)
+│       ├── styles/             # Global CSS variables and utility classes
+│       ├── App.jsx             # React Router Hub and App Shell
+│       ├── index.css           # Global neon typography and Tailwind setup injections
+│       └── main.jsx            # React 18 createRoot React DOM mount
 │
 └── README.md
 ```
@@ -137,9 +150,9 @@ The core team responsible for forging this architecture:
   *Leader, 2D UI Elements, AI Integration*
 - **[Vineet](https://github.com/vineet1cg)**
   *3D UI Elements, 3D Model Engineering*
-- **[Sahil]()**
+- **[Sahil](https://github.com/sahilchaudhari32)**
   *Data Handler, Database Manager*
-- **[Ankit]()**
+- **[Ankit](https://github.com/ankitkumar764)**
   *Backend Handler, Test Runner*
 
 ---
