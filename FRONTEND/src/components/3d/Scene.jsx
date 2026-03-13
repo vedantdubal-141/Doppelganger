@@ -14,29 +14,32 @@ function Scene({ children }) {
       shadows
       style={{ background: 'transparent' }}
     >
-      {/* Ambient fill */}
-      <ambientLight intensity={0.5} color="#b0c4ff" />
+      {/* Ambient fill — brighter for fabric detail */}
+      <ambientLight intensity={0.7} color="#d0d8ff" />
 
-      {/* Main key light */}
+      {/* Main key light — slightly stronger */}
       <directionalLight
         position={[5, 8, 5]}
-        intensity={1.4}
+        intensity={1.6}
         color="#ffffff"
         castShadow
         shadow-mapSize-width={1024}
         shadow-mapSize-height={1024}
       />
 
-      {/* Fill light from left */}
-      <directionalLight position={[-4, 4, 2]} intensity={0.4} color="#e0e0ff" />
+      {/* Fill light from left — softer */}
+      <directionalLight position={[-4, 4, 2]} intensity={0.6} color="#e8e0ff" />
 
-      {/* Neon rim lights for retro-futurism */}
-      <pointLight position={[-3, 2, -2]} intensity={0.6} color="#00F0FF" />
-      <pointLight position={[3, 2, -2]} intensity={0.4} color="#7B61FF" />
-      <pointLight position={[0, -1, 3]} intensity={0.3} color="#FF2EA6" />
+      {/* Neon rim lights for retro-futurism — softer for fabric */}
+      <pointLight position={[-3, 2, -2]} intensity={0.4} color="#00F0FF" />
+      <pointLight position={[3, 2, -2]} intensity={0.3} color="#7B61FF" />
+      <pointLight position={[0, -1, 3]} intensity={0.2} color="#FF2EA6" />
 
-      {/* Environment for reflections */}
-      <Environment preset="city" />
+      {/* Back rim light for silhouette */}
+      <pointLight position={[0, 3, -4]} intensity={0.5} color="#ffffff" />
+
+      {/* Environment for reflections — studio preset gives best fabric rendering */}
+      <Environment preset="studio" />
 
       {/* Contact shadow beneath model */}
       <ContactShadows

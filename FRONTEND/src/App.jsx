@@ -9,6 +9,8 @@ import Profile from './pages/Profile';
 import StyleAnalyzer from './pages/StyleAnalyzer';
 import Recommendations from './pages/Recommendations';
 import VirtualTryOn from './pages/VirtualTryOn';
+import Login from './pages/Login';
+import Signup from './pages/Signup';
 import { BiometricGuard } from './components/layout/ProtectedRoute';
 
 function App() {
@@ -19,6 +21,8 @@ function App() {
         <main className="flex-1 w-full flex flex-col pt-16">
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/community" element={<CommunityFeed />} />
             <Route path="/profile" element={<Profile />} />

@@ -18,7 +18,35 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => {
     try {
       const saved = localStorage.getItem('styleforge_user');
-      return saved ? JSON.parse(saved) : DEFAULT_GUEST;
+      let parsed = saved ? JSON.parse(saved) : DEFAULT_GUEST;
+
+      const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      
+      // Auto-authenticate as "Rishab" solely on the local device
+      if (isLocalhost) {
+        if (!localStorage.getItem('styleforge_token')) {
+          localStorage.setItem('styleforge_token', 'local_dev_token_rishab');
+        }
+        if (parsed.isGuest) {
+           parsed = {
+             id: 1,
+             username: 'Rishab',
+             email: 'rishab@local.dev',
+             biometrics: null,
+             savedOutfits: [],
+             isGuest: false,
+           };
+           localStorage.setItem('styleforge_user', JSON.stringify(parsed));
+        }
+      }
+      
+      // The user requested to change the locally saved "neon_runner" to "rishab"
+      if (parsed.username && parsed.username.toLowerCase() === 'neon_runner') {
+        parsed.username = 'Rishab';
+        localStorage.setItem('styleforge_user', JSON.stringify(parsed));
+      }
+      
+      return parsed;
     } catch {
       return DEFAULT_GUEST;
     }
